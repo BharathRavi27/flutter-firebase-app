@@ -1,4 +1,5 @@
 import 'package:brew_score/models/user.dart';
+import 'package:brew_score/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService {
@@ -45,7 +46,25 @@ class AuthService {
           email: email, password: password);
 
       FirebaseUser user = result.user;
-      _userFromFirebaseUser(user);
+
+      // create a document for the user
+
+      await DatabaseService(uid: user.uid)
+          .updateUserdata('0', 'new member', 100);
+      return _userFromFirebaseUser(user);
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
+  }
+
+  // signin with email
+  signInWithEmailAndPassword(String email, String password) async {
+    try {
+      AuthResult result = await _auth.signInWithEmailAndPassword(
+          email: email, password: password);
+      FirebaseUser user = result.user;
+      return _userFromFirebaseUser(user);
     } catch (e) {
       print(e.toString());
       return null;
